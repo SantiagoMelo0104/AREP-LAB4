@@ -107,7 +107,12 @@ El servidor utiliza las anotaciones @Component y  @GetMapping para gestionar y e
 
 ![imagen](https://github.com/SantiagoMelo0104/AREP-LAB4/assets/123812833/558d8fbf-f251-42bc-aea2-17841c80bfe5)
 
+Aqui se evidencia el resultado tras haber cargado y clasificado aquellos archivos que cuentas con @Component y @RequestMapping
+
+![imagen](https://github.com/SantiagoMelo0104/AREP-LAB4/assets/123812833/63933c04-acda-420d-9df5-9e175a835227)
+
 El controlador en este caso es aquella clse con la que estamos experimentado a ponerle las anotaciones para comprobar el funcionamineto de esta nueva funcionalidad del servidor:
+
 ![imagen](https://github.com/SantiagoMelo0104/AREP-LAB4/assets/123812833/84230d03-9bb6-49c7-a892-194d82ca62d9)
 
 
