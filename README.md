@@ -16,7 +16,7 @@ Es **importante**❗tener instalado:
 # Instalación ⬇️
 Los siguiente comando le permitira clonar el repositorio de manera local:
 ~~~
-git clone https://github.com/SantiagoMelo0104/AREP-LAB3.git
+https://github.com/SantiagoMelo0104/AREP-LAB4
 ~~~
 
 # Ejecución🪄 
