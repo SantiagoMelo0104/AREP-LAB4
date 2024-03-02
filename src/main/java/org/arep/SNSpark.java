@@ -1,9 +1,11 @@
 package org.arep;
 
-
+import com.google.common.reflect.ClassPath;
+import org.arep.annotation.Component;
+import org.arep.annotation.GetMapping;
 import org.arep.conexion.Function;
-
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
@@ -13,14 +15,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
+import java.io.IOException;
+import org.reflections.Reflections;
+import java.util.Set;
 
 /**
  * Class to start the server
+ *
  * @author Santiago Naranjo
  * @author Daniel Benavides
  */
 public class SNSpark {
 
+    static Map<String, Method> componentes = new HashMap<String, Method>();
     private static HashMap<String, Function> service = new HashMap<>();
     public static boolean running = false;
     private static SNSpark instance = null;
@@ -42,7 +50,7 @@ public class SNSpark {
      * Starts the SNSpark server and listens for incoming connections on port 35000.
      *
      * @param args command-line arguments (ignored)
-     * @throws IOException if there is an error starting the server
+     * @throws IOException        if there is an error starting the server
      * @throws URISyntaxException if there is an error parsing a URI
      */
     public void start(String[] args) throws IOException, URISyntaxException {
@@ -53,6 +61,7 @@ public class SNSpark {
             System.err.println("Could not listen on port: 35000.");
             System.exit(1);
         }
+        classLoader();
 
         SNSpark.running = true;
         while (running) {
@@ -85,15 +94,31 @@ public class SNSpark {
 
             URI requestUri = new URI(uriStr);
             try {
-                System.out.println("----------------"+ requestUri.getPath());
+                System.out.println("----------------" + requestUri.getPath());
                 if (requestUri.getPath().startsWith("/action")) {
-                    if(service.containsKey(requestUri.getPath().replace("/action",""))){
+                    if (service.containsKey(requestUri.getPath().replace("/action", ""))) {
                         outputLine = callService(requestUri);
                         out.println(outputLine);
-                    } else if(requestUri.getPath().contains(".")){
+                    } else if (requestUri.getPath().contains(".")) {
                         httpResponse(requestUri.getPath().replace("/action", ""), clientSocket.getOutputStream());
-                    }else{
+                    } else {
                         httpError();
+                    }
+                }else if( requestUri.getPath().startsWith("/components")){
+                    if (componentes.containsKey(requestUri.getPath().replace("/components", ""))) {
+                        String output = "HTTP/1.1 200 OK\r\n"
+                                + "Content-Type:text/html\r\n"
+                                + "\r\n";
+                        System.out.println("si entro..");
+                        Method m = componentes.get(requestUri.getPath().replace("/components", ""));
+                        if(requestUri.getQuery() != null){
+                            String[] query = requestUri.getQuery().split("=");
+                            System.out.println(m.getParameterCount() +"????????????" + query[1]);
+                            output += m.invoke(null, (Object) query[1]);
+                        }else{
+                            output += m.invoke(null);
+                        }
+                        out.println(output);
                     }
                 } else {
                     httpResponse(requestUri.getPath(), clientSocket.getOutputStream());
@@ -123,10 +148,9 @@ public class SNSpark {
                 + "\r\n";
 
         if (service.containsKey(calledServiceUri)) {
-            if(requestUri.getQuery() != null){
+            if (requestUri.getQuery() != null) {
                 output += service.get(calledServiceUri).handle(requestUri.getQuery().split("=")[1]);
-            }
-            else{
+            } else {
                 output += service.get(calledServiceUri).handle("");
             }
         }
@@ -137,8 +161,8 @@ public class SNSpark {
      * Registers a GET request handler for the given path.
      *
      * @param path the path for which to register the handler
-     * @param s the handler function to execute when the path is requested via a GET request
-     * @throws IOException if there is an error registering the handler
+     * @param s    the handler function to execute when the path is requested via a GET request
+     * @throws IOException        if there is an error registering the handler
      * @throws URISyntaxException if the path is not a valid URI
      */
     public static void get(String path, Function s) throws IOException, URISyntaxException {
@@ -149,8 +173,8 @@ public class SNSpark {
      * Registers a POST request handler for the given path.
      *
      * @param path the path for which to register the handler
-     * @param s the handler function to execute when the path is requested via a POST request
-     * @throws IOException if there is an error registering the handler
+     * @param s    the handler function to execute when the path is requested via a POST request
+     * @throws IOException        if there is an error registering the handler
      * @throws URISyntaxException if the path is not a valid URI
      */
     public static void post(String path, Function s) throws IOException, URISyntaxException {
@@ -162,8 +186,8 @@ public class SNSpark {
      *
      * @return the HTTP error response as a string
      */
-    public static String httpError(){
-        String outputLine ="HTTP/1.1 404 Not Found \r\n"
+    public static String httpError() {
+        String outputLine = "HTTP/1.1 404 Not Found \r\n"
                 + "Content-Type:text/html\r\n"
                 + "\r\n"
                 + "<!DOCTYPE html>\n"
@@ -216,4 +240,27 @@ public class SNSpark {
         }
     }
 
+    //
+    private static void classLoader() throws IOException {
+        ClassPath classPath = ClassPath.from(ClassLoader.getSystemClassLoader());
+        for (ClassPath.ClassInfo classInfo : classPath.getTopLevelClassesRecursive("org.arep")) {
+            Class<?> c = classInfo.load();
+            System.out.println("Archivo Cargado: " + c);
+            if (c.isAnnotationPresent(Component.class)) {
+                System.out.println("Class " + c.getName() + " is annotated with @Component");
+            }
+            for (Method m : c.getDeclaredMethods()) {
+                if (m.isAnnotationPresent(GetMapping.class)) {
+                    try {
+                        componentes.put(m.getAnnotation(GetMapping.class).value(), m);
+                    } catch (Exception e) {
+                        System.err.println("Error putting method in map: " + e.getMessage());
+                    }
+                }
+            }
+        }
+        for (Map.Entry<String, Method> entry : componentes.entrySet()) {
+            System.out.println("Key : " + entry.getKey() + " Value : " + entry.getValue());
+        }
+    }
 }

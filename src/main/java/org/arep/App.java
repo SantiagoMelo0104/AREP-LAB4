@@ -7,7 +7,7 @@ import static org.arep.SNSpark.get;
 import static org.arep.SNSpark.post;
 
 public class App {
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException, URISyntaxException, ClassNotFoundException {
         get("/hola", (req) -> {
             return "Hola Mundo O_O " + req;
         });

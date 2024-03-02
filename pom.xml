@@ -26,10 +26,19 @@
             <version>2.8.9</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
-            <scope>test</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.0.0-jre</version>
         </dependency>
     </dependencies>
     <build>
@@ -73,6 +82,24 @@
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.simpligility.maven.plugins</groupId>
+                    <artifactId>multidex-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                    <executions>
+                        <execution>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>prepare</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <mainDexClasses>
+                            <mainDexClass>org.arep.App</mainDexClass>
+                        </mainDexClasses>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

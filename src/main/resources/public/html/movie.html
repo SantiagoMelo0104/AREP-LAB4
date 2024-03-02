@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo 😎</title>
+    <link rel="stylesheet" href="/css/movie.css">
+</head>
+<body class="center">
+<h1 class="center"> Cátalogo de Películas ❗❗</h1>
+<div class="center">
+    <input type="text" id="searchFilm" placeholder="Escribe el titulo de la película...">
+    <button onclick="searchMovie()">Search</button>
+    <div class="content-container">
+        <div class="movie-poster">
+            <div id="postrespmsgimg" class="hide">
+                <img id="postrespmsgimgsrc" alt="Movie poster" width="100%">
+            </div>
+        </div>
+        <div class="movie-info">
+            <div id="postrespmsg" class="hide">
+                <p></p>
+            </div>
+            <div id="postrespmsgtitle" class="hide">
+                <h2 id="postrespmsgtitletext"></h2>
+            </div>
+            <table id="movieData" class="hide">
+                <tr>
+                    <td>Título:</td>
+                    <td id="movieTitle"></td>
+                </tr>
+                <tr>
+                    <td>Año:</td>
+                    <td id="movieYear"></td>
+                </tr>
+                <tr>
+                    <td>Calificación:</td>
+                    <td id="movieRated"></td>
+                </tr>
+                <tr>
+                    <td>Estreno:</td>
+                    <td id="movieReleased"></td>
+                </tr>
+                <tr>
+                    <td>Duración:</td>
+                    <td id="movieRuntime"></td>
+                </tr>
+                <tr>
+                    <td>Género:</td>
+                    <td id="movieGenre"></td>
+                </tr>
+                <tr>
+                    <td>Director:</td>
+                    <td id="movieDirector"></td>
+                </tr>
+                <tr>
+                    <td>Escritor:</td>
+                    <td id="movieWriter"></td>
+                </tr>
+                <tr>
+                    <td>Reparto:</td>
+                    <td id="movieActors"></td>
+                </tr>
+                <tr>
+                    <td>Sinopsis:</td>
+                    <td id="moviePlot"></td>
+                </tr>
+                <tr>
+                    <td>Idioma:</td>
+                    <td id="movieLanguage"></td>
+                </tr>
+                <tr>
+                    <td>País:</td>
+                    <td id="movieCountry"></td>
+                </tr>
+                <tr>
+                    <td>Premios:</td>
+                    <td id="movieAwards"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    function searchMovie() {
+        const searchFilm = document.getElementById("searchFilm").value;
+        if (!searchFilm) {
+            document.getElementById("postrespmsg").innerHTML = "<p>Please enter a movie title.</p>";
+            return;
+        }
+
+        fetch(`http://www.omdbapi.com/?apikey=6395a690&t=${searchFilm}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.Response === "True") {
+                    document.getElementById("movieTitle").textContent = data.Title;
+                    document.getElementById("postrespmsgimgsrc").src = data.Poster;
+                    document.getElementById("movieYear").textContent = data.Year;
+                    document.getElementById("movieRated").textContent = data.Rated;
+                    document.getElementById("movieReleased").textContent = data.Released;
+                    document.getElementById("movieRuntime").textContent = data.Runtime;
+                    document.getElementById("movieGenre").textContent = data.Genre;
+                    document.getElementById("movieDirector").textContent = data.Director;
+                    document.getElementById("movieWriter").textContent = data.Writer;
+                    document.getElementById("movieActors").textContent = data.Actors;
+                    document.getElementById("moviePlot").textContent = data.Plot;
+                    document.getElementById("movieLanguage").textContent = data.Language;
+                    document.getElementById("movieCountry").textContent = data.Country;
+                    document.getElementById("movieAwards").textContent = data.Awards;
+
+                    document.getElementById("postrespmsg").classList.add("hide");
+                    document.getElementById("postrespmsgimg").classList.remove("hide");
+                    document.getElementById("postrespmsgtitle").classList.remove("hide");
+                    document.getElementById("movieData").classList.remove("hide");
+                    document.getElementById("postrespmsgtitletext").textContent = data.Title;
+                } else {
+                    document.getElementById("postrespmsg").classList.remove("hide");
+                    document.getElementById("postrespmsgimg").classList.add("hide");
+                    document.getElementById("postrespmsgtitle").classList.add("hide");
+                    document.getElementById("movieData").classList.add("hide");
+
+                    document.getElementById("postrespmsg").textContent = `No results found for "${searchFilm}".`;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("postrespmsg").classList.remove("hide");
+                document.getElementById("postrespmsgimg").classList.add("hide");
+                document.getElementById("postrespmsgtitle").classList.add("hide");
+                document.getElementById("movieData").classList.add("hide");
+
+                document.getElementById("postrespmsg").textContent = "An error occurred while fetching the data.";
+            });
+    }
+</script>
+</body>
+</html>
