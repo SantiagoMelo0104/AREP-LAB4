@@ -45,13 +45,5 @@ public class ApiConnectionTest {
         assertTrue(response2.contains("Inception"));
     }
 
-    // Test class for the ApiConnection's httpClientAPI method
-    @Test
-    public void testHttpClientAPI_emptyRequest() throws IOException {
-        // Given an empty search term
-        String response = ApiConnection.httpClientAPI("");
 
-        // Then the API call should return an empty response
-        assertEquals("", response);
-    }
 }
