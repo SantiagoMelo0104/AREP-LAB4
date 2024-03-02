@@ -244,11 +244,16 @@ public class SNSpark {
     }
 
     //
+    /**
+     * Loads all classes on the classpath that are in the package `org.arep` or any of its subpackages. Checks if each class is annotated with the `@Component` annotation and, if so, iterates over each method of the class to find methods annotated with `@GetMapping`. Adds each found method to a map with the `@GetMapping` annotation as the key and the method as the value.
+     *
+     * @throws IOException if an error occurs while obtaining classpath resources
+     */
     private static void classLoader() throws IOException {
         ClassPath classPath = ClassPath.from(ClassLoader.getSystemClassLoader());
         for (ClassPath.ClassInfo classInfo : classPath.getTopLevelClassesRecursive("org.arep")) {
             Class<?> c = classInfo.load();
-            System.out.println("Archivo Cargado: " + c);
+            System.out.println("Loaded file: " + c);
             if (c.isAnnotationPresent(Component.class)) {
                 System.out.println("Class " + c.getName() + " is annotated with @Component");
             }
@@ -266,4 +271,5 @@ public class SNSpark {
             System.out.println("Key : " + entry.getKey() + " Value : " + entry.getValue());
         }
     }
+
 }
