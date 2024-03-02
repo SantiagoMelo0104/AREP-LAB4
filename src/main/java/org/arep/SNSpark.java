@@ -91,6 +91,9 @@ public class SNSpark {
                     break;
                 }
             }
+            String output = "HTTP/1.1 200 OK\r\n"
+                    + "Content-Type:text/html\r\n"
+                    + "\r\n";
 
             URI requestUri = new URI(uriStr);
             try {
@@ -106,19 +109,19 @@ public class SNSpark {
                     }
                 }else if( requestUri.getPath().startsWith("/components")){
                     if (componentes.containsKey(requestUri.getPath().replace("/components", ""))) {
-                        String output = "HTTP/1.1 200 OK\r\n"
-                                + "Content-Type:text/html\r\n"
-                                + "\r\n";
+
                         System.out.println("si entro..");
                         Method m = componentes.get(requestUri.getPath().replace("/components", ""));
                         if(requestUri.getQuery() != null){
                             String[] query = requestUri.getQuery().split("=");
-                            System.out.println(m.getParameterCount() +"????????????" + query[1]);
+
                             output += m.invoke(null, (Object) query[1]);
                         }else{
                             output += m.invoke(null);
                         }
                         out.println(output);
+                    }else{
+                        httpError();
                     }
                 } else {
                     httpResponse(requestUri.getPath(), clientSocket.getOutputStream());
